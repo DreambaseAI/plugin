@@ -1,0 +1,12 @@
+{
+  "name": "dreambase-plugin-repo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync:manifests": "node scripts/sync-manifests.mjs",
+    "check:plugin": "node scripts/validate.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "build:plugin": "node scripts/build-plugin.mjs",
+    "check:hosted": "node scripts/check-hosted.mjs"
+  }
+}

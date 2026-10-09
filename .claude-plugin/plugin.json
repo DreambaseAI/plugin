@@ -1,0 +1,26 @@
+{
+  "name": "dreambase",
+  "version": "2.0.0",
+  "description": "Connect to Dreambase to query, plan, and operate workspace data.",
+  "author": {
+    "name": "Dreambase",
+    "url": "https://dreambase.com"
+  },
+  "homepage": "https://dreambase.com",
+  "repository": "https://github.com/DreambaseAI/plugin",
+  "license": "MIT",
+  "keywords": [
+    "dreambase",
+    "mcp",
+    "analytics",
+    "datasets",
+    "supabase"
+  ],
+  "displayName": "Dreambase",
+  "icon": "./assets/logo.png",
+  "documentationUrl": "https://github.com/DreambaseAI/plugin#readme",
+  "supportUrl": "https://github.com/DreambaseAI/plugin/issues",
+  "privacyPolicyUrl": "https://dreambase.com/legal/privacy",
+  "termsOfServiceUrl": "https://dreambase.com/legal/terms",
+  "mcpServers": "./.mcp.json"
+}
