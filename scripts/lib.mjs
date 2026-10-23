@@ -17,6 +17,7 @@ export const runtimeFiles = [
   ".codex-plugin/plugin.json",
   ".agents/plugins/marketplace.json",
   "skills/dreambase-mcp/SKILL.md",
+  "skills/dreambase-setup/SKILL.md",
   "skills/dreambase-mcp/agents/openai.yaml",
   "skills/dreambase-mcp/references/connectors.md",
   "skills/dreambase-mcp/references/data-workflows.md",
@@ -80,7 +81,20 @@ export function generatedFiles(manifest) {
     },
     "mcp.json": {
       $schema: "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
-      mcpServers: { dreambase: { type: "streamable-http", url: endpoint } },
+      mcpServers: { dreambase: {
+        type: "streamable-http",
+        url: endpoint,
+        extensions: { "com.openai": { auth: {
+          type: "oauth",
+          client: { mode: "cimd" },
+          defaultScopes: [
+            "workspaces:read", "datasets:read", "datasets:write",
+            "metrics:read", "metrics:write", "connections:read", "connections:write",
+            "skills:read", "skills:write", "data-domains:read", "data-domains:write",
+            "health-reports:read", "health-reports:write",
+          ],
+        } } },
+      } },
     },
     ".mcp.json": {
       mcpServers: { dreambase: { type: "http", url: endpoint } },

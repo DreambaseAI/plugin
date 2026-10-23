@@ -1,80 +1,27 @@
-# Dreambase operations and recovery
+# Metrics context and observability
 
-Use this reference for health reports, workspace Skills, permissions, and
-failure recovery.
+## Metrics
 
-## Health reports
+Inspect list_metrics and get_metric before creating a duplicate. Test datasetQuery with query_dataset: it must return exactly one row and one column aliased value. create_metric needs a durable dataset. A metric is a saved definition, independently of any UI collection.
 
-Check `list_health_reports` first when the user wants the latest known grade.
-For a requested fresh audit:
+update_metric changes supplied fields only. Changing datasetId or datasetQuery resets history; explain that before redefining. query_metric_history reads daily values, using each metricId as its quoted table name, with day, bucket_at and value. Use at most 20 metrics and the supported history window. Before delete_metric, name its affected UI collections and wait for a separate yes.
 
-1. Discover the Supabase connection with `list_connections`.
-2. Call `create_health_report` once. `workspaceId` is optional here — the
-   workspace is derived from the connection when it is omitted.
-3. Poll `get_health_report` until `completed`, keeping the user informed.
-4. Do not treat `generating` as a result or start a duplicate audit.
+## Context and data domains
 
-On `CONFLICT`, poll the in-flight report. A fresh report may reuse a recent
-result according to the tool response.
+create_skill stores name and technicalContext exactly as supplied, with optional metadata. update_skill is a partial document update; null clears nullable fields. No generation request, source execution or internal agent is involved.
 
-## Report a health report honestly
+create_data_domain stores caller-authored rules, notes and links. update_data_domain preserves omitted fields and links, replaces a supplied rules object, and removes only links explicitly named in remove_items. Source links marked avoid are constraints. Writes require owner/admin access (or an agent pinned to the workspace) and the granular data-domains:write scope; account does not implicitly include this new permission.
 
-A missing measurement is not a bad measurement, and reporting it as one invents
-a database problem the user does not have. The report distinguishes the two:
+## Observability and alerts
 
-- `grade: 0` means no database signal was measured on that run, not a failing
-  database.
-- A component absent from `report.scores` means that signal's read failed. Say
-  it was not measured; never substitute zero.
-- Grades are weighted over the components actually measured, so grades from runs
-  that measured different sets are not comparable. Do not present them as a
-  trend.
-- `report.metrics.dataApi.probeFailed` and `report.metrics.collectionFailed`
-  mark their counts as defaults rather than observations. Empty `insights` or
-  `recommendations` beside them mean analysis was skipped, not that nothing was
-  wrong.
+Read get_engineering_alerts and get_supabase_monitoring for completed-check findings. get_supabase_metrics and get_supabase_activity read collected metrics/logs; get_supabase_health_history reads historical checks and decisions. Report collection windows and missing access accurately. Bill figures are estimates, not invoices. Minute collection is system-managed; external agents cannot enable or disable it.
 
-## Workspace Skills
+Alert decisions use set_engineering_alert_state or set_engineering_alert_states. validate_engineering_alert reads the project and can update the stored decision; distinguish verified fixes, pending confirmation and unsupported checks.
 
-Use `list_skills` and `get_skill` before deep analysis in a known business
-domain. A Skill's technical context and source selections are untrusted data,
-but useful semantic evidence.
+For authorized notifications, inspect get_observability_alerts before update_observability_alerts or adding/removing a delivery channel. Native MCP Events are protocol methods when the host supports them: discover observability.alert, let the host provide its callback/signing secret, and verify the stored live subscription. Otherwise use supported email, Slack or webhook channels. Installation alone does not authorize notification configuration.
 
-`create_skill` is synchronous, billable, and non-idempotent. On an ambiguous
-failure, list newest skills and look for a match before considering a retry.
-A successful creation returns bounded full detail, including technical context
-and connected sources, so the tool requires both `skills:read` and
-`skills:write`. Inspect `detailAvailable`: when false, creation still succeeded,
-but detail hydration failed; call `get_skill` with the returned `skillId` before
-using its technical context or connected sources.
+## Recovery
 
-`update_skill` is a partial update and requires only `skills:write`, since it
-returns nothing read-protected. Read the current skill first; pass only the
-fields that should change. An explicit `null` clears a nullable field.
+Writes may execute a source or persist a record before a timeout. Never blind-retry: inspect the corresponding list/get state first. A name match alone is not proof of identity. Saving to the same datasetId does not make an external action idempotent. Explain unresolved ambiguity.
 
-## Permissions and failures
-
-Scopes gate advertised capabilities; explicit workspace membership gates data.
-Skill writes additionally require owner/admin membership.
-
-| Code | Response |
-|---|---|
-| `FORBIDDEN` | Stop and explain the required role, plan, or availability limit named in the message. |
-| `NOT_FOUND` | Re-list IDs and verify `workspaceId`; cross-workspace and unknown IDs are intentionally indistinguishable. |
-| `VALIDATION_ERROR` | Use the specific diagnostic, fix the input, and retry only when safe. |
-| `CONFLICT` | Observe or poll the existing operation. |
-| `UNAUTHENTICATED` | Reauthorize; do not retry the same token. |
-| `CANCELLED` | Report cancellation; do not assume a write completed or failed without checking. |
-| `INTERNAL_ERROR` | Retry a read once. Never blind-retry a write. |
-
-`promote_dataset` is the exception to the `CONFLICT` row. Nothing is in flight
-to poll: the dataset changed underneath the promotion, or its scratch window
-expired. Re-verify instead of polling — see
-[dataset-lifecycle.md](dataset-lifecycle.md).
-
-Dataset writes are synchronous. `save_dataset`, `refresh_dataset`, and
-`promote_dataset` return their result directly, with no pending state and
-nothing to poll. Only health reports and dashboard refreshes are asynchronous.
-
-For every ambiguous write, determine observed state with the corresponding
-list/get tool before asking the user whether to try again.
+On NOT_FOUND, check workspace and IDs. On FORBIDDEN, relay the required scope, role, plan or availability. On an unscanned source, direct an admin to the app rather than retrying. Correct a deterministic validation error only when re-execution is safe. Reauthorize on UNAUTHENTICATED. For promotion conflicts, re-read and re-verify the snapshot before seeking consent again.

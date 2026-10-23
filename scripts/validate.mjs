@@ -26,7 +26,8 @@ export function validate(base = root) {
     assert.ok(lstatSync(full).isFile(), `${path} must be a regular file`);
     assert.ok(lstatSync(full).size < 256 * 1024, `${path} exceeds the Anthropic text-file threshold`);
   }
-  assert.deepEqual(readdirSync(join(base, "skills")), ["dreambase-mcp"], "Only dreambase-mcp may ship");
+  assert.deepEqual(readdirSync(join(base, "skills")), ["dreambase-mcp", "dreambase-setup"], "Only product and setup skills may ship");
+  assert.equal(manifest.extensions["com.openai"].onboardingSkill, "./skills/dreambase-setup/SKILL.md");
   const skillRoot = join(base, "skills/dreambase-mcp");
   const skillFiles = [];
   function walk(dir) {
@@ -43,7 +44,7 @@ export function validate(base = root) {
   walk(skillRoot);
   assert.deepEqual(
     skillFiles.map((path) => path.slice(base.length + 1)).sort(),
-    runtimeFiles.filter((path) => path.startsWith("skills/")),
+    runtimeFiles.filter((path) => path.startsWith("skills/dreambase-mcp/")),
     "Skill files must match the runtime allowlist",
   );
   const skillBytes = skillFiles.reduce((total, path) => total + lstatSync(path).size, 0);
@@ -62,12 +63,24 @@ export function validate(base = root) {
       assert.ok(existsSync(target), `Broken resource link: ${link}`);
     }
   }
+  const setupRoot = join(base, "skills/dreambase-setup");
+  const setupFiles = readdirSync(setupRoot);
+  assert.deepEqual(setupFiles, ["SKILL.md"], "Setup files must match the runtime allowlist");
+  const setup = readFileSync(join(setupRoot, "SKILL.md"), "utf8");
+  const setupFrontmatter = setup.match(/^---\nname: ([^\n]+)\ndescription: ([^\n]+)\n---\n([\s\S]+)$/);
+  assert.ok(setupFrontmatter && setupFrontmatter[1] === "dreambase-setup", "Invalid setup skill frontmatter");
+  assert.ok(setupFrontmatter[2].length <= 1024, "Setup skill description exceeds 1024 characters");
+  assert.ok(Buffer.byteLength(setup) <= skillLimit, "Setup skill exceeds runtime skill budget");
+  for (const path of runtimeFiles.filter((path) => /\.(md|json|yaml)$/.test(path))) {
+    const text = readFileSync(join(base, path), "utf8");
+    assert.ok(!/\b(?:plan_datasets|list_dashboards|get_minute_metrics|set_minute_metrics)\b/.test(text), `Retired tool referenced in ${path}`);
+  }
   const iface = manifest.extensions["com.openai"].interface;
   for (const [field, max] of [["displayName", 30], ["shortDescription", 30], ["longDescription", 4000], ["developerName", 80]]) {
     assert.equal(typeof iface[field], "string", `Missing ${field}`);
     assert.ok(iface[field].trim() && iface[field].length <= max, `Invalid ${field}`);
   }
-  assert.equal(iface.category, "Productivity");
+  assert.equal(iface.category, "Data & Analytics");
   for (const field of ["websiteURL", "supportURL", "privacyPolicyURL", "termsOfServiceURL"]) {
     assert.ok(iface[field].length <= 1024 && new URL(iface[field]).protocol === "https:", `Invalid ${field}`);
   }

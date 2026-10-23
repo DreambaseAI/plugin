@@ -1,113 +1,47 @@
 # Dreambase
 
-Connect your coding agent to Dreambase to query existing datasets, plan and save
-new datasets, inspect dashboards and connections, manage dataset retention and
-freshness, and review database health. This plugin bundles one focused skill,
-`dreambase-mcp`, and the hosted Dreambase MCP connection.
+Connect agents to Dreambase for connected data, scratch datasets, saved metrics, workspace context and Supabase observability. The package includes dreambase-mcp for everyday operations and dreambase-setup for guided onboarding.
 
-## Install
-
-The published installer currently accepts the real repository address:
+## Install and connect
 
 ```bash
 npx plugins add DreambaseAI/plugin --yes
 ```
 
-The planned short command, `npx plugins add dreambase/plugin --yes`, requires
-the installer alias update described in [installer migration](https://github.com/DreambaseAI/plugin/blob/main/docs/installer-migration.md).
-Until that update is published, use `DreambaseAI/plugin`.
-
-Select a single client with `--target claude-code`, `--target cursor`,
-`--target codex`, or `--target grok`. The installer otherwise uses detected
-clients. Installing a plugin does not authorize your Dreambase account; OAuth
-consent happens separately in your client.
-
-For native Claude Code installation:
+Native Claude Code:
 
 ```bash
 claude plugin marketplace add DreambaseAI/plugin
 claude plugin install dreambase@dreambase
 ```
 
-For native Codex installation:
+Native Codex:
 
 ```bash
 codex plugin marketplace add DreambaseAI/plugin
 codex plugin add dreambase@dreambase
 ```
 
-Cursor can install the plugin from its marketplace once the listing is approved,
-or through the installer above. Grok Build also accepts the Claude-compatible
-plugin directly:
+Complete the client's Dreambase OAuth flow. New users sign up on the platform, connect Supabase, and return to their original client connection. Run setup to verify the workspace and source and configure requested alerts. Installation and notification authorization are separate.
 
-```bash
-grok plugin install DreambaseAI/plugin --trust
-```
+## What agents can do
 
-## Connect and verify
+Discover source schemas; author exact SQL/API/MCP dataset definitions; save and query scratch snapshots; retain verified data; manage dataset refresh schedules; define and query metrics; store caller-authored context documents and data-domain rules; inspect collected health, activity and metrics; configure authorized alert destinations.
 
-Sign in at [Dreambase](https://app.dreambase.com), join or create a workspace,
-and connect a data source in the app. Restart your agent client, connect its
-Dreambase MCP server, and complete its browser-based OAuth consent flow.
-Then ask the agent to call `whoami` and `list_workspaces`. An empty workspace
-list means the signed-in account needs workspace membership.
+The external surface uses primitives. Dataset authoring and context creation do not run Dreambase's internal generation agent. Minute collection is controlled by the system. Availability depends on scopes, workspace role, plan, analytics access and deployment.
 
-The sole declared MCP endpoint is `https://app.dreambase.com/mcp`. The plugin
-ships no local server, lifecycle hook, runtime package dependency, telemetry
-script, or token. Authorized MCP calls send their arguments to Dreambase; source
-planning and execution can also invoke your connected providers. Results depend
-on OAuth scopes, workspace membership, account plan, and available deployment
-features. Some dataset write tools are experimental and may not be advertised
-for every account.
+ChatGPT Work sessions that support MCP Events can subscribe to observability.alert. Other clients can configure supported email, Slack or webhook destinations. Do not assume a channel will wake an unsupported client in the background.
 
-For example, ask to summarize your dashboards, query weekly signups from an
-existing dataset, or review the latest database health report. Dataset planning
-and saving are separate steps. Refreshing re-executes the source and can incur
-usage. Promotion starts durable-storage usage and cannot currently be undone;
-the skill requires a separate confirmation after verification.
+## Privacy and support
 
-## Optional skills and migration
-
-Chart design, ECharts, public reporting, storytelling, presentations, industrial
-schematics, micrographics, and skill creation live in
-[DreambaseAI/skills](https://github.com/DreambaseAI/skills). Install them
-independently when needed:
-
-```bash
-npx skills add DreambaseAI/skills --skill dreambase-echarts
-```
-
-Version 2.0.0 preserves the plugin and MCP skill identifiers but removes the
-other eight skills from the plugin bundle. Existing users should update the
-plugin or reinstall from this repository. Once the skills-repo migration lands,
-its Claude and Codex catalogs redirect to this source; Cursor users should reinstall. Previously
-installed optional skills can be installed separately from the skills library.
+Use only data you are authorized to access. Review the [privacy policy](https://dreambase.com/legal/privacy) and [terms](https://dreambase.com/legal/terms). Report issues through [support](https://github.com/DreambaseAI/plugin/issues), excluding credentials and private data.
 
 ## Development
 
-Node.js 20+ and the `zip` command are needed for development and packaging.
-There are no npm dependencies and no install hooks.
+Run npm run check:plugin, npm test, npm run build:plugin and npm run check:hosted. Review docs/submission.md before public submission. Static checks do not establish successful OAuth, model behavior, event delivery or directory acceptance.
 
-```bash
-npm run sync:manifests
-npm run check:plugin
-npm test
-npm run build:plugin
-npm run check:hosted
-```
+MIT licensed. Hosted service: https://app.dreambase.com/mcp.
 
-Edit `plugin.json` as the canonical metadata source, then synchronize the
-compatibility manifests. The build emits `dist/dreambase-plugin.zip` and
-`dist/package-report.json`. It copies only the runtime allowlist and enforces
-project budgets of 64 KiB for the skill and 256 KiB for the complete ZIP; these
-are internal limits, not marketplace quotas. Tests, development scripts,
-submission documentation, and CI do not enter the ZIP.
+The OpenAI MCP profile declares OAuth with CIMD preference and explicit granular default scopes, including data-domain writes. Users authorize those scopes through the host’s normal OAuth flow. Existing account-only grants do not silently gain them. Legacy client overlays retain their native MCP format.
 
-See [submission preparation](https://github.com/DreambaseAI/plugin/blob/main/docs/submission.md) for platform-specific review
-steps and the checks requiring authenticated accounts.
-
-## Support and license
-
-[Support](https://github.com/DreambaseAI/plugin/issues) ·
-[Privacy](https://dreambase.com/legal/privacy) ·
-[Terms](https://dreambase.com/legal/terms) · [MIT license](LICENSE)
+CI validates the exact supported OpenAI configuration and then checks an extension-free portable projection against the generic Agent Plugins 1.0 schema, which does not model OpenAI server extensions. The projection rejects unknown or missing authentication fields before removing the validated extension.

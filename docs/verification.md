@@ -1,40 +1,29 @@
-# Verification for the 2.0.0 split
+# Verification for 3.0.0
 
-Checked on 2026-10-09:
+Record results against the exact source revision and package hash. Local manifest/package tests establish file integrity, allowlists and argument wiring. Isolated installer tests stub native clients; they do not prove UI, OAuth or behavior.
 
-- Six automated package/alias tests pass: canonical metadata, manifest drift,
-  missing or symlinked resources, unexpected skills, size growth, exact archive
-  contents, and source normalization boundaries.
-- Portable plugin and MCP manifests pass the Agent Plugins 1.0.0 JSON schemas.
-- Both Claude manifests pass `claude plugin validate --strict` with 2.1.293.
-- The pinned official Cursor template validator passes. It reports only that
-  hooks are absent, which is expected for this remote-MCP package.
-- Published `plugins@1.3.4` installs this local plugin in isolated Claude,
-  Cursor, and Codex stores. Repeat installation preserves existing sentinel
-  settings and does not duplicate the registered plugin. Grok's native command
-  is invoked with the expected arguments.
-- A workspace-patched copy of that npm bundle passes discovery and installation
-  tests for the short alias and old repository forms across all four targets.
-  Its native Grok call receives the canonical new repository identity.
-- Website, support, privacy, and terms endpoints respond successfully. OAuth
-  metadata advertises PKCE S256 and registration, and unauthenticated MCP
-  initialization returns the expected discovery challenge.
-- The original four references, OpenAI skill dependency file, and 12 evaluation
-  scenarios are preserved. The runtime skill occupies 27,789 bytes. The build's
-  `dist/package-report.json` records the final archive size and file inventory.
+Required evidence includes: current local checks; exact ZIP inventory; supported-client setup; production signup and Supabase return; five positive/three negative review cases; real recording; authorized event subscription/delivery/renewal/unsubscribe; safe alternate-client delivery; publisher/domain verification and portal scans.
 
-Installer tests stub native client executables and, for alias tests, the network
-clone. They verify installation wiring, resource preservation, source routing,
-and repeat-install behavior. They do not verify a real client's UI, OAuth
-session, tool discovery after sign-in, or model behavior.
+Until executed, each live case remains not run. docs/submission.md describes the reviewer fixtures and secure access requirements. Optional installer alias publication is separate from the canonical documented install path.
 
-Still required before marketplace submission:
+## Build verification — 2026-10-23
 
-- Integrate the alias helper into the publisher's installer source and publish
-  its npm release. The patched bundle used for testing was not published.
-- Run the behavioral evaluations and five positive/three negative review cases
-  with a dedicated, seeded reviewer account, including experimental access
-  where required.
-- Record a real walkthrough and enter credentials through the secure portals.
-- Complete domain verification, authenticated tool/annotation scans, and each
-  platform's submission and policy attestations.
+- Local plugin validator: passed, 19 runtime files, two packaged skills.
+- Package/manifest tests: 6 passed.
+- Agent Plugins 1.0 plugin schema and portable MCP core projection: passed using ajv-cli 5; exact OpenAI server profile validated separately.
+- Claude Code 2.1.293 strict plugin/marketplace validation: passed.
+- Cursor pinned template validator: passed; hooks warning is informational because this plugin has no hooks.
+- Published plugins 1.3.4 installer harness: Claude Code, Cursor, Codex and Grok passed, including repeated installation, with native executables stubbed and isolated configuration directories.
+- Hosted listing/legal/support URLs, protected resource metadata, OAuth S256/registration and MCP auth challenge: passed.
+
+These checks do not exercise production login, Supabase consent or live MCP Events. The connected dev server still advertises the previous contract; deploy the revised server before behavioral review. New Supabase onboarding also requires workspace Observability access. The ZIP hash and exact inventory are recorded with the build evidence in Dream's feature implementation report.
+
+## Local E2E verification — 2026-10-23
+
+The sibling Dream worktree's isolated seeded stack passed five of seven planned flows: OAuth login/register return, fresh signup/email confirmation/setup, exact context and domain persistence through MCP/REST with database probes, retired-tool/route and legacy-scope denial, and redirect/interrupted-setup recovery. All 14 existing OAuth browser regressions passed. Full Dream Vitest: 944 files passed, 13,760 tests passed, 98 skipped.
+
+Actual modern HTTP discovery advertises Events and declares observability.alert. This is not host event delivery evidence. Supabase's real provider challenged the authorized seeded fixture sign-in with hCaptcha before credentials were validated; consent/import/agent return remains blocked. Supported Work-host callback/delivery remains blocked pending a matching hosted deployment and host session. No local raw credentials/HARs are packaged or published.
+
+## Branch review corrections — 2026-10-23
+
+Restored the required OpenAI server OAuth declaration, CIMD preference and 13 granular default scopes. A dedicated regression fails against the original missing declaration. The exact OpenAI profile is validated before the generic core projection; unknown/missing auth fields fail rather than being stripped silently. An independent verifier extracted the built ZIP, compared it with source, checked all requested scopes against the server catalog and rejected nine malformed profiles. These are configuration/package checks, not evidence of portal acceptance or actual hosted CIMD negotiation.
