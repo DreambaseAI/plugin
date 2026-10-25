@@ -1,6 +1,6 @@
 # Submission preparation for 3.0.0
 
-The package contains dreambase-mcp and dreambase-setup plus the hosted MCP configuration. Run npm run check:plugin, npm test, npm run build:plugin and npm run check:hosted. Inspect the actual ZIP and its package report. CI additionally checks portable schemas, Claude compatibility, Cursor validation and isolated installer wiring.
+The package contains dreambase-mcp and dreambase-setup plus the hosted MCP configuration. Run npm run check:plugin, npm test, npm run build:plugin and npm run check:hosted -- --origin https://the-explicit-deployment.example. Inspect the actual ZIP and its package report. CI additionally checks portable schemas, Claude compatibility, Cursor validation and isolated installer wiring.
 
 ## Contract and rollout
 
@@ -33,3 +33,5 @@ Upload, submission and publication are separate actions. A valid ZIP does not pr
 Sources: https://developers.openai.com/plugins/deploy/submission and https://developers.openai.com/plugins/build/mcp-events.
 
 Authentication configuration follows the [OpenAI packaging reference](https://developers.openai.com/plugins/build/plugins#configure-mcp-authentication). The upstream generic MCP schema does not model server extensions: validation checks the exact supported OpenAI profile before projecting the portable core. Do not remove the OAuth declaration merely to satisfy that generic schema.
+
+Agent scenarios are runnable with an explicit host adapter and disposable fixture; see [evaluation instructions](evaluations.md). Default runs record not_run, never a behavioral pass. Hosted checks require the exact target origin and verify OAuth metadata/challenges; they do not exercise signed-in tools or prove directory acceptance.

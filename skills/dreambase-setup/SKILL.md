@@ -35,3 +35,5 @@ Offer supported email, Slack or HTTPS webhook channels. Use only a user-supplied
 ## Finish
 
 Summarize the selected workspace, observed Supabase connection readiness, configured rules and verified destination/subscription state. Name any pending first check, missing permission, unsupported capability or unverified delivery. Offer a first bounded analytics or observability question using the main dreambase-mcp skill.
+
+After reading alert settings, explain delivery readiness explicitly. Count live native MCP subscriptions as destinations too. If delivery says no_destinations, enabled alerts currently reach no one; configure only the destination the user requested and verify delivery separately.

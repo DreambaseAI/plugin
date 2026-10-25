@@ -3,3 +3,6 @@ dist/
 .context/
 .DS_Store
 __pycache__/
+
+# Private agent evaluation traces
+tests/eval-results/

@@ -27,3 +27,9 @@ Actual modern HTTP discovery advertises Events and declares observability.alert.
 ## Branch review corrections — 2026-10-23
 
 Restored the required OpenAI server OAuth declaration, CIMD preference and 13 granular default scopes. A dedicated regression fails against the original missing declaration. The exact OpenAI profile is validated before the generic core projection; unknown/missing auth fields fail rather than being stripped silently. An independent verifier extracted the built ZIP, compared it with source, checked all requested scopes against the server catalog and rejected nine malformed profiles. These are configuration/package checks, not evidence of portal acceptance or actual hosted CIMD negotiation.
+
+## Agent-experience follow-up — 2026-10-24
+
+Build checks on `codex/mcp-agent-experience`: 14 Node tests pass, including explicit-origin OAuth metadata checks using synthetic responses and evaluation-adapter execution with sanitized fixture traces. The 19-file runtime allowlist and package budget validate. The evaluation plan records 18 scenarios as not_run unless an explicit host adapter is supplied; fixture checks are not agent behavior evidence. The package remains dependent on deploying the companion Dream branch before reviewing new tool workflows.
+
+Follow-up hosted/host behavior has not yet been tested. Configure the new preview branch's matching OAuth issuer before checking its explicit origin; the parent branch's successful auth checks are historical evidence only. Provider hCaptcha and actual host Events delivery remain external acceptance checks. Marketplace acceptance has not been established.

@@ -38,10 +38,12 @@ Use only data you are authorized to access. Review the [privacy policy](https://
 
 ## Development
 
-Run npm run check:plugin, npm test, npm run build:plugin and npm run check:hosted. Review docs/submission.md before public submission. Static checks do not establish successful OAuth, model behavior, event delivery or directory acceptance.
+Run npm run check:plugin, npm test, npm run build:plugin and npm run check:hosted -- --origin https://the-explicit-deployment.example. Review docs/submission.md before public submission. Static checks do not establish successful OAuth, model behavior, event delivery or directory acceptance.
 
 MIT licensed. Hosted service: https://app.dreambase.com/mcp.
 
 The OpenAI MCP profile declares OAuth with CIMD preference and explicit granular default scopes, including data-domain writes. Users authorize those scopes through the host’s normal OAuth flow. Existing account-only grants do not silently gain them. Legacy client overlays retain their native MCP format.
 
 CI validates the exact supported OpenAI configuration and then checks an extension-free portable projection against the generic Agent Plugins 1.0 schema, which does not model OpenAI server extensions. The projection rejects unknown or missing authentication fields before removing the validated extension.
+
+Agent scenarios are runnable with an explicit host adapter and disposable fixture; see [evaluation instructions](docs/evaluations.md). Default runs record not_run, never a behavioral pass. Hosted checks require the exact target origin and verify OAuth metadata/challenges; they do not exercise signed-in tools or prove directory acceptance.
