@@ -22,7 +22,7 @@ description: Use Dreambase for connected data exploration, saved datasets and me
 | Compare historical KPIs | query_metric_history |
 | Store context or counting rules | create_skill/update_skill or create_data_domain/update_data_domain |
 | Inspect health | get_engineering_alerts summaries → get_engineering_alert_detail by connectionId/key; get_supabase_monitoring summary/detail |
-| Inspect collected activity or samples | get_supabase_activity, get_supabase_metrics, get_supabase_health_history, list_supabase_branches |
+| Inspect collected activity or samples | get_supabase_activity, get_supabase_metrics, get_supabase_health_history summary/detail; list_supabase_branches |
 | Use enabled catalog actions | Inspect capability → search_connection_actions → describe_connection_action → authorized call_connection_action |
 | Requested notifications | Read get_observability_alerts delivery readiness, then authorized configuration/native MCP Events |
 
@@ -34,7 +34,9 @@ Writes require user authorization. Never blindly retry an ambiguous source execu
 
 Preview never persists, but it executes a source operation. It refuses unknown or mutating operations, uses database-enforced read-only SQL, allows only scanned enabled API GETs, and requires scanned/live read-only MCP declarations. Remote hints describe the provider contract, not independent proof. Unsupported operations stay refused; do not bypass with save_dataset or another tool.
 
-A preview is a bounded sample, never a total. Missing is not zero, source coverage is not cache freshness, configured delivery is not observed delivery, and estimated cost is not measured billing. Use explicit dates, grain, timezone and business definitions. Query one saved dataset as the literal table dataset. Exact cross-dataset joins require an appropriate source definition; separate samples are not an exact join.
+A preview does not establish underlying source coverage. complete refers only to whether an exact SQL query result fits; API/MCP previews are single calls. Read the server guide for lookahead and optional column selection. Missing is not zero, source coverage is not cache freshness, configured delivery is not observed delivery, and estimated cost is not measured billing. Use explicit dates, grain, timezone and business definitions. Query one saved dataset as the literal table dataset. Exact cross-dataset joins require an appropriate source definition; separate samples are not an exact join.
+
+Connection-action tools may be absent when no accessible workspace enables them; inspect capabilities and the server guide. Read observability result envelopes and use summary/detail deliberately.
 
 Use IDs, provenance and data-domain ownership to distinguish equal names. Do not declare one canonical by guessing. Report truncated or compacted responses and follow continuation; read one detail instead of requesting every SQL fix. If alerts are enabled with no live destinations, say that no one can receive them.
 
