@@ -53,8 +53,8 @@ syncBuiltinESMExports();
     const run = (args) => execFileSync(process.execPath, ["--import", preload, bundle, ...args], { env, cwd: temporary, encoding: "utf8", stdio: "pipe" });
     const discovery = run(["discover", source]);
     assert.match(discovery, /Found 1 local plugin\(s\)/);
-    assert.match(discovery, /dreambase\s+1 skill, mcp/);
-    assert.doesNotMatch(discovery, /dreambase-echarts/);
+    assert.match(discovery, /dreambase\s+2 skills, mcp/);
+    assert.doesNotMatch(discovery, /unexpected-skill/);
     run(["add", source, "--target", target, "--yes"]);
     run(["add", source, "--target", target, "--yes"]);
     const settings = JSON.parse(readFileSync(join(userDir, ".claude/settings.json"), "utf8"));
@@ -69,7 +69,7 @@ syncBuiltinESMExports();
         assert.deepEqual(readFileSync(path), readFileSync(join(root, "skills/dreambase-mcp/SKILL.md")));
         assert.ok(existsSync(join(dirname(path), "references/dataset-lifecycle.md")));
       }
-      assert.ok(!walk(userDir).some((path) => path.includes("dreambase-echarts")));
+      assert.ok(!walk(userDir).some((path) => path.includes("unexpected-skill")));
       if (target === "codex") {
         const marketplace = JSON.parse(readFileSync(join(userDir, ".agents/plugins/marketplace.json"), "utf8"));
         assert.equal(marketplace.plugins.filter((plugin) => plugin.name === "dreambase").length, 1);
@@ -112,7 +112,7 @@ fi
           DISABLE_TELEMETRY: "1", DO_NOT_TRACK: "1", NO_COLOR: "1",
         };
         const run = (args) => execFileSync(process.execPath, ["--import", preload, bundle, ...args], { env, cwd: temporary, encoding: "utf8", stdio: "pipe" });
-        assert.match(run(["discover", alias]), /dreambase\s+1 skill, mcp/);
+        assert.match(run(["discover", alias]), /dreambase\s+2 skills, mcp/);
         run(["add", alias, "--target", target, "--yes"]);
         assert.match(readFileSync(gitLog, "utf8"), /https:\/\/github.com\/DreambaseAI\/plugin/);
         if (target === "grok") assert.match(readFileSync(log, "utf8"), /grok plugin install DreambaseAI\/plugin --trust/);

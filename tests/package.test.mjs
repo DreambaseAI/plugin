@@ -40,9 +40,9 @@ test("missing reference, symlink, extra skill, and skill growth are rejected", (
   assert.throws(() => validate(base), /Runtime symlink/);
   rmSync(path);
   writeFileSync(path, original);
-  mkdirSync(join(base, "skills/dreambase-echarts"));
-  assert.throws(() => validate(base), /Only dreambase-mcp/);
-  rmSync(join(base, "skills/dreambase-echarts"), { recursive: true });
+  mkdirSync(join(base, "skills/unexpected-skill"));
+  assert.throws(() => validate(base), /Only product and setup/);
+  rmSync(join(base, "skills/unexpected-skill"), { recursive: true });
   writeFileSync(path, "x".repeat(64 * 1024));
   assert.throws(() => validate(base), /internal cap/);
 });
@@ -68,6 +68,31 @@ test("the built ZIP contains only installable runtime files", () => {
     offset += 46 + nameLength + extraLength + commentLength;
   }
   assert.deepEqual(entries, runtimeFiles);
-  assert.ok(!entries.some((path) => /(^tests\/|^scripts\/|echarts|node_modules|\.git\/)/.test(path)));
+  assert.ok(!entries.some((path) => /(^tests\/|^scripts\/|unexpected-skill|node_modules|\.git\/)/.test(path)));
   assert.equal(readJson("dist/package-report.json").archiveBytes, archive.length);
+});
+
+test("OpenAI MCP connection declares OAuth and explicit data-domain write consent", () => {
+  const auth = readJson("mcp.json").mcpServers.dreambase.extensions?.["com.openai"]?.auth;
+  assert.equal(auth?.type, "oauth");
+  assert.equal(auth.client.mode, "cimd");
+  assert.ok(auth.defaultScopes.includes("data-domains:write"));
+  assert.ok(auth.defaultScopes.includes("data-domains:read"));
+  assert.ok(!auth.defaultScopes.includes("account"));
+});
+
+test("portable core projection retains server semantics and rejects auth drift", async () => {
+  const { portableMcpCore } = await import("../scripts/portable-mcp.mjs");
+  const config = readJson("mcp.json");
+  const core = portableMcpCore(config);
+  assert.deepEqual(core.mcpServers.dreambase, {
+    type: "streamable-http", url: config.mcpServers.dreambase.url,
+  });
+  assert.ok(config.mcpServers.dreambase.extensions, "Projection must not mutate its input");
+  const missingAuth = structuredClone(config);
+  delete missingAuth.mcpServers.dreambase.extensions;
+  assert.throws(() => portableMcpCore(missingAuth), /OpenAI profile/);
+  const badAuth = structuredClone(config);
+  badAuth.mcpServers.dreambase.extensions["com.openai"].auth.clientSecret = "must-not-ship";
+  assert.throws(() => portableMcpCore(badAuth), /OpenAI profile/);
 });

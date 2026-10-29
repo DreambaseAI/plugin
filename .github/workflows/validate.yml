@@ -23,7 +23,11 @@ jobs:
           curl --fail --silent --show-error https://agent-plugins.org/schemas/1.0.0/plugin.schema.json -o /tmp/plugin.schema.json
           curl --fail --silent --show-error https://agent-plugins.org/schemas/1.0.0/mcp.schema.json -o /tmp/mcp.schema.json
           npx --yes ajv-cli@5.0.0 validate --spec=draft2020 --strict=false -s /tmp/plugin.schema.json -d plugin.json
-          npx --yes ajv-cli@5.0.0 validate --spec=draft2020 --strict=false -s /tmp/mcp.schema.json -d mcp.json
+          # The generic schema does not model OpenAI server extensions. Our
+          # validator checks the exact supported auth configuration first;
+          # validate its extension-free portable core against the upstream schema.
+          node scripts/portable-mcp.mjs > /tmp/mcp.portable.json
+          npx --yes ajv-cli@5.0.0 validate --spec=draft2020 --strict=false -s /tmp/mcp.schema.json -d /tmp/mcp.portable.json
       - name: Validate Claude
         run: |
           npx --yes @anthropic-ai/claude-code@2.1.293 plugin validate .claude-plugin/plugin.json --strict

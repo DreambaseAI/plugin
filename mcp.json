@@ -3,7 +3,32 @@
   "mcpServers": {
     "dreambase": {
       "type": "streamable-http",
-      "url": "https://app.dreambase.com/mcp"
+      "url": "https://app.dreambase.com/mcp",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "oauth",
+            "client": {
+              "mode": "cimd"
+            },
+            "defaultScopes": [
+              "workspaces:read",
+              "datasets:read",
+              "datasets:write",
+              "metrics:read",
+              "metrics:write",
+              "connections:read",
+              "connections:write",
+              "skills:read",
+              "skills:write",
+              "data-domains:read",
+              "data-domains:write",
+              "health-reports:read",
+              "health-reports:write"
+            ]
+          }
+        }
+      }
     }
   }
 }

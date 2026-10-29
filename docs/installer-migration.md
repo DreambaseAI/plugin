@@ -45,7 +45,7 @@ their own remote-source catalogs.
 ## Acceptance checks
 
 Test alias and canonical forms, HTTPS and SSH spellings, the old repo, unrelated
-repos, and local paths. Confirm discovery finds only `dreambase-mcp`, and that
+repos, and local paths. Confirm discovery finds the Dreambase plugin with `dreambase-mcp` and `dreambase-setup`, and that
 the Grok native command receives `DreambaseAI/plugin`. Preserve existing user
 settings and verify repeated installation does not duplicate the plugin.
 
